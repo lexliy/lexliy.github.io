@@ -1,37 +1,692 @@
-## Welcome to GitHub Pages
 
-You can use the [editor on GitHub](https://github.com/lexliy/lexliy.github.io/edit/master/index.md) to maintain and preview the content for your website in Markdown files.
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<!-- meta -->
+		<meta charset="utf-8"></meta>
+		<meta content="IE=edge" http-equiv="X-UA-Compatible"></meta>
+		<meta content="width=device-width, initial-scale=1" name="viewport"></meta>
+		<!-- window title -->
+		<title> Using Crosstool-ng | nairobi-embedded </title>
+		<!-- css styles -->
+		<link rel="stylesheet" href="/theme/css/bootstrap.css">
+	</head>
+	<body>
+		<header id="top" class="navbar navbar-inverse navbar-fixed-top" role="banner">
+		<div class="container">
+			<a class="navbar-brand" href="/">nairobi-embedded</a>
+				<button class="navbar-toggle" data-target=".bs-navbar-collapse" data-toggle="collapse" type="button">
+	  		  <span class="sr-only"></span>
+  		  	<span class="icon-bar"></span>
+		    	<span class="icon-bar"></span>
+  	  		<span class="icon-bar"></span>
+				</button>
+			<nav class="collapse navbar-collapse bs-navbar-collapse" data-target=".nav-collapse" role="navigation" >
+				<ul class="nav navbar-nav">
+				<!-- list categories on the nav bar -->
+				<!-- "toolchains", "linux" and "platforms" appear first -->
+								<li><a href="/category/gnulinux-toolchain-sw-dev.html">GNU/Linux Toolchain & S/W Dev</a></li>
+								<li><a href="/category/linux.html">Linux</a></li>
+								<li><a href="/category/platforms.html">Platforms</a></li>
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+						<!-- "category index" appears next to the right -->
+								<li><a href="/category/index.html">Category Index</a></li>
 
-### Markdown
+						<!-- "about" appears last (to the right) -->
+								<li><a href="/category/about.html">About</a></li>						
+				</ul>
+			</nav>
+			</div>
+		</div>
+		</header>
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+		<!-- page "meat" -->	
+	  <div class="container-fluid">
 
-```markdown
-Syntax highlighted code block
+			<!-- allow children to disable sitename from appearing on their content-->
+ 
+			
+			<!-- allow children to define their own content -->	
 
-# Header 1
-## Header 2
-### Header 3
+	<div class='article'>
+	<div class="page-header"><h1>Using Crosstool-ng</h1></div>
 
-- Bulleted
-- List
+	<!-- no author metadata for "special" categories -->
+		
+			<div class="well small">	<p><b>Author:</b> <a class="url fn" href="/author/mugabi-siro.html"><i>Mugabi Siro</i></a></p>
+	<p><b>Category:</b><a href="/category/gnulinux-toolchain.html"> GNU/Linux Toolchain</a></p>
+<p><b>Summary:</b> <p>This entry discusses general considerations when using crosstool-NG, an automated toolchain build utlility. For purposes of illustration, Ubuntu is used as the build platform.</p></p>
+<i>Tags: <a href="/tag/gnulinux-toolchain.html">gnu/linux toolchain </a><a href="/tag/gnu.html">gnu </a><a href="/tag/linux.html">linux </a><a href="/tag/crosstool-ng.html">crosstool-ng </a><a href="/tag/cross-compiling.html">cross-compiling </a></i></div>
 
-1. Numbered
-2. List
+		<div><div class="toc">
+<ul>
+<li><a href="#overview">Overview</a><ul>
+<li><a href="#crosstool-ng-package-build-dependencies">Crosstool-NG Package Build dependencies</a></li>
+<li><a href="#obtaining-crosstool-ng">Obtaining crosstool-NG</a></li>
+<li><a href="#crosstool-ng-configuration-and-build-process">Crosstool-NG Configuration and Build Process</a><ul>
+<li><a href="#phase-1">Phase 1</a></li>
+<li><a href="#phase-2">Phase 2</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#phase-1-generating-and-locating-the-toolchain-build-tree">PHASE 1: Generating and Locating the Toolchain Build Tree</a><ul>
+<li><a href="#staging-the-toolchain-build-tree">Staging the toolchain build tree</a></li>
+</ul>
+</li>
+<li><a href="#phase-2-toolchain-configuration-build-and-install">PHASE 2: Toolchain Configuration, Build and Install</a><ul>
+<li><a href="#preliminaries">Preliminaries</a></li>
+<li><a href="#configuration">Configuration</a><ul>
+<li><a href="#environment-variables">Environment Variables</a></li>
+<li><a href="#entering-string-options">Entering String options</a></li>
+<li><a href="#common-config-options">Common Config Options</a></li>
+</ul>
+</li>
+<li><a href="#build-and-install">Build and Install</a></li>
+</ul>
+</li>
+<li><a href="#performing-re-builds">Performing Re-builds</a></li>
+<li><a href="#also-see">Also See</a></li>
+<li><a href="#resources">Resources</a></li>
+<li><a href="#appendix-a-known-issues">Appendix A: Known Issues</a><ul>
+<li><a href="#archive-download-failure">Archive Download Failure</a></li>
+<li><a href="#ppl-0102-compiling-error-with-gcc-471">ppl-0.10.2 compiling error with gcc 4.7.1</a></li>
+</ul>
+</li>
+<li><a href="#appendex-b-linux-kernel-version-vs-minimum-supported-kernel-version">Appendex B: Linux kernel version vs. Minimum supported kernel version</a><ul>
+<li><a href="#configuration_1">Configuration</a></li>
+<li><a href="#build-log">Build Log</a></li>
+<li><a href="#checking-kernel-version-info">Checking Kernel Version Info</a></li>
+</ul>
+</li>
+<li><a href="#footnotes">Footnotes</a></li>
+</ul>
+</div>
+<h2 id="overview">Overview</h2>
+<p><em><a href="http://crosstool-ng.org/">Crosstool New Generation (crosstool-NG)</a></em>
+is a fork of the original <a href="http://www.kegel.com/crosstool">crosstool</a>
+toolchain build facility. It offers, among other things, a friendlier configuration interface and build system than its predecessor. It includes support for:</p>
+<ul>
+<li>
+<p>a number of archictures including Alpha, ARM, AVR32, 
+    Blackfin, m68k, MIPS, PowerPC, s390, SH, and x86(_64). </p>
+</li>
+<li>
+<p>both <em>(e)glibc</em> and <em>uClibc</em>. </p>
+</li>
+<li>
+<p>inclusion of debug utilities such as <code>gdb</code>,
+    <code>ltrace</code>, <code>strace</code>, <code>dmalloc</code> and
+ <code>duma</code> into the final toolchain</p>
+</li>
+</ul>
+<p>Crosstool-NG also presents a useful platform for studying 
+toolchain build. For example, check out the instructions in
+the file <code>docs/9 - How is a toolchain constructed.txt</code>
+in the crosstool-NG source tree. </p>
+<p>This entry covers general considerations when using the 
+crosstool-NG facility. The objective here is to provide the
+general working background required when building a toolchain 
+via crosstool-NG. For examples of using crosstool-NG 
+to build a specific toolchain, follow the links at the
+bottom in Section <a href="/using_crosstool-ng.html#also-see">link</a>.</p>
+<h3 id="crosstool-ng-package-build-dependencies">Crosstool-NG Package Build dependencies</h3>
+<p>At least on Ubuntu 12.04 and 13.04:</p>
+<pre><code>$ sudo apt-get update
+$ sudo apt-get install build-essential autoconf automake libtool
+$ sudo apt-get install flex bison libncurses5-dev gettext texinfo 
+$ sudo apt-get install gperf gawk curl cvs subversion
+</code></pre>
+<h3 id="obtaining-crosstool-ng">Obtaining crosstool-NG</h3>
+<p>To obtain the latest development version, 
+use  <a href="http://mercurial.selenic.com/">Mercural</a>:</p>
+<pre><code>$ sudo apt-get install mercurial
+$ hg clone http://crosstool-ng.org/hg/crosstool-ng/
+</code></pre>
+<p>With this tree, you may have to generate the <em>GNU configure</em>
+script before proceeding with the toolchain configuration 
+and build process:</p>
+<pre><code>$ cd crosstool-ng
+$ ./bootstrap
+Running autoconf...
+Done. You may now run:
+  ./configure
+</code></pre>
+<p>Alternatively, a direct download of a specific archive release
+can be made via this  <a href="http://crosstool-ng.org/download/crosstool-ng/">link</a>.</p>
+<h3 id="crosstool-ng-configuration-and-build-process">Crosstool-NG Configuration and Build Process</h3>
+<p>Although crosstool-NG uses the <em>GNU configure</em>
+and <code>make</code> build systems, it does so in a 
+somewhat unconventional manner. It works in 
+two phases:</p>
+<h4 id="phase-1">Phase 1</h4>
+<p>Generation of the <code>ct-ng</code> utility and miscellaneous
+build scripts. This is done via the conventional</p>
+<pre><code>$ ./configure 
+$ make
+$ make install
+</code></pre>
+<p>command sequence. The end result being the generation of a
+<em>toolchain build tree</em> that contains the 
+<code>ct-ng</code><sup><a href="#fn2" id="ref2">2</a></sup>
+ tool and other build files. 
+This toolchain build tree is what is required to perform <em>Phase 2</em>.
+In other words, the downloaded crosstool-NG sources are
+only required to produce this second phase toolchain build tree.</p>
+<h4 id="phase-2">Phase 2</h4>
+<p>This is the actual
+toolchain configuration and build process via the generated 
+<code>ct-ng</code> and miscalleneous build files/scripts (i.e. the generated toolchain build tree).</p>
+<h2 id="phase-1-generating-and-locating-the-toolchain-build-tree">PHASE 1: Generating and Locating the Toolchain Build Tree</h2>
+<p>Depending on the user's toolchain configuration settings,
+crosstool-NG will, correspondingly, download a number of
+toolchain component archive files from the Internet for the
+automated toolchain build process.
+During toolchain build (i.e. <em>Phase 2</em>),
+all build actions and output 
+ (around 5GB) is done in a <em>working directory</em>
+    before the final toolchain files
+(binaries, libraries, headers, etc - typically less than 500MB)
+are packaged and installed in a separate target directory. </p>
+<p>This working directory is, by default, located at the root
+of the generated toolchain build tree<sup><a href="#fn3" id="ref3">3</a></sup>. 
+It is recommended that these default settings be used <em>as-is</em>. Also recall that the generated toolchain build tree is 
+the location from where <em>Phase 2</em> is performed.</p>
+<p>Now, it is often desirable to separate the locations of the
+crosstool-NG sources, downloaded archives, toolchain build tree, and final toolchain binaries:</p>
+<ul>
+<li>
+<p>In the event of a toolchain build error,
+a simple deletion of the toolchain build tree 
+guarantees a clean restart
+without affecting the sources or downloaded archive 
+files (and thus the need to perform lengthy re-downloads).</p>
+</li>
+<li>
+<p>Once toolchain build is complete, the toolchain build tree
+(now around 5GB in size) need not be kept around and may be deleted to save
+disk space.</p>
+</li>
+</ul>
+<p>Assuming that the following steps have been completed:</p>
+<pre><code>$ KAZIDIR=$PWD
+$ wget http://crosstool-ng.org/download/crosstool-ng/crosstool-ng-1.17.0.tar.bz2
+$ tar xjf crosstool-1.17.0.tar.bz2
+$ CT_SOURCE=${PWD}/crosstool-ng-1.17.0
+$ cd $CT_SOURCE
+</code></pre>
+<p>then the following standard commands will generate the 
+toolchain build tree:</p>
+<pre><code>./configure [--prefix]
+make 
+make install
+</code></pre>
+<p>The <code>--prefix</code> option to <em>configure</em> specifies
+ where the generated toolchain build tree will be 
+installed:</p>
+<ul>
+<li>
+<p><b><i>Default installation of the generated toolchain build tree:</i></b></p>
+<p>By default (i.e. if the <code>--prefix</code> option is omitted) crosstool-NG will attempt to install the toolchain build tree
+under <code>/usr/local</code> when <code>make install</code> is executed.</p>
+</li>
+<li>
+<p><b><i>Installing the generated toolchain build tree within source tree:</i></b></p>
+<pre><code>$configure --prefix=${PWD}
+</code></pre>
+<p>or</p>
+<pre><code>$ configure --enable-local
+</code></pre>
+<p>In this case, the root of the toolchain build tree will
+coincide with the root of the crosstool-NG source tree.</p>
+</li>
+<li>
+<p><b><i>Installing the generated toolchain build tree somewhere else:</i></b></p>
+<p>Unless hacking crosstool-NG, this may be the
+recommended approach. Specify an absolute path
+to a (non-system) directory outside the crosstool-NG source
+tree e.g:</p>
+<pre><code>$ CT_BUILDTREE=${KAZIDIR}/ct_build
+$ ./configure --prefix=$CT_BUILDTREE
+$ make
+$ make install
+</code></pre>
+<p>Note that <code>$CT_BUILDTREE</code> will be created if it didn't exist.</p>
+</li>
+</ul>
+<p>At this point, if the toolchain build tree was generated <em>outside</em> the
+source tree, then the crosstool-NG sources are now no longer
+required for the rest of the toolchain build process (i.e.
+        <em>Phase 2</em>).</p>
+<p>In any case, after running <code>make install</code>, 
+the hierarchy of the generated toolchain build tree should resemble: </p>
+<p><center>
+<img src="/img/build_tree.jpg" alt="phase1 build tree" height="200" width="200">
+</center></p>
+<p>Pay special attention to the relative location of the <code>ct-ng</code> utility.</p>
+<h3 id="staging-the-toolchain-build-tree">Staging the toolchain build tree</h3>
+<p>So far, the installation of the toolchain build tree
+has been in the context of performing toolchain compilation
+from the current build machine. It is also possible to package 
+the toolchain build tree for distribution via the use 
+of the <code>DESTDIR</code> directive to <code>make install</code>.
+See <a href="/building_packages_with_configure.html">Building Packages with <em>configure</em></a>
+    for a detailed explanation on staging and a crosstool-NG case study on the subject.</p>
+<h2 id="phase-2-toolchain-configuration-build-and-install">PHASE 2: Toolchain Configuration, Build and Install</h2>
+<p>Central to this process is the generated
+<code>ct-ng</code> utility. It is a "bash-make" script and functions
+similar to the <code>make</code> command. </p>
+<h3 id="preliminaries">Preliminaries</h3>
+<p>Prior to using <code>ct-ng</code>, the following
+optional steps may be performed. For most practical 
+purposes, these steps can be skipped:</p>
+<ul>
+<li>
+<p>Include <code>ct-ng</code>'s location in <code>$PATH</code></p>
+</li>
+<li>
+<p>Shell completion:</p>
+<p>Crosstool-NG comes with a shell script fragment that defines bash-compatible
+completion. As of the version of crosstool-NG used 
+in this entry, the shell fragment is not installed automatically.
+To install the shell script fragment, you have two options:</p>
+<ul>
+<li>
+<p>Install system-wide e.g. by copying <code>ct-ng.comp</code> into
+   <code>/etc/bash_completion.d/</code></p>
+</li>
+<li>
+<p>Install for a single user e.g. by copying <code>ct-ng.comp</code>
+ into <code>${HOME}/</code> and   sourcing this file from your <code>${HOME}/.bashrc</code></p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="configuration">Configuration</h3>
+<p>The instructions in this
+section assume that the <code>$PWD</code> is the root of the
+toolchain build
+tree generated in <em>phase 1</em> above.</p>
+<p>To view the available <code>ct-ng</code> options:</p>
+<pre><code>$ bin/ct-ng --help #
+</code></pre>
+<p>To enter the toolchain configuration menu:</p>
+<pre><code>$ bin/ct-ng menuconfig
+</code></pre>
+<p>To use, or begin with, a default configuration:</p>
+<ul>
+<li>
+<p>List available sample configurations:</p>
+<pre><code>$ bin/ct-ng list-samples
+Status  Sample name
+[G.X]   alphaev56-unknown-linux-gnu
+[G.X]   alphaev67-unknown-linux-gnu
+[G.X]   arm-bare_newlib_cortex_m3_nommu-eabi
+[G.X]   arm-cortex_a15-linux-gnueabi
+[G..]   arm-cortex_a8-linux-gnueabi
+...
+[G..]   arm-unknown-linux-gnueabi
+[G.X]   arm-unknown-linux-uclibcgnueabi
+...
+[G.X]   mips64el-n32-linux-uclibc
+[G.X]   mips64el-n64-linux-uclibc
+[G.X]   mips-ar2315-linux-gnu
+[G..]   mipsel-sde-elf
+[G..]   mipsel-unknown-linux-gnu
+...
+[G..]   powerpc-unknown-linux-gnu
+[G..]   powerpc-unknown-linux-uclibc
+[G..]   powerpc-unknown_nofpu-linux-gnu
+[G.X]   s390-ibm-linux-gnu
+[G.X]   s390x-ibm-linux-gnu
+[G..]   sh4-unknown-linux-gnu
+[G..]   x86_64-unknown-linux-gnu
+[G..]   x86_64-unknown-linux-uclibc
+ L (Local)       : sample was found in current directory
+ G (Global)      : sample was installed with crosstool-NG
+ X (EXPERIMENTAL): sample may use EXPERIMENTAL features
+ B (BROKEN)      : sample is currently broken
+</code></pre>
+</li>
+<li>
+<p>Select a sample configuration:</p>
+<pre><code>$ bin/ct-ng arm-unknown-linux-gnueabi
+</code></pre>
+<p>At this point you may run <code>menuconfig</code>, to make
+any modifications.</p>
+</li>
+</ul>
+<h4 id="environment-variables">Environment Variables</h4>
+<p>There are three environment variables that are 
+computed by crosstool-NG and available for use in 
+the configuration menu e.g. in string options:</p>
+<ul>
+<li>
+<p><code>CT_TARGET</code></p>
+<p>Expands to the <em>GNU triplet</em> that forms
+ the toolchain tuple (i.e. minus the trailing hyphen ``-") of 
+ the <em>target</em><sup><a href="#fn4" id="ref4">4</a></sup>.
+ In other words, the compiler and \emph{Binutils} 
+components of the generated toolchain will be prefixed with
+the this tuple. </p>
+</li>
+<li>
+<p><code>CT_TOP_DIR</code></p>
+<p>The root of the toolchain build directory. </p>
+</li>
+<li>
+<p><code>CT_VERSION</code></p>
+<p>The version of crosstool-NG being used.</p>
+</li>
+</ul>
+<h4 id="entering-string-options">Entering String options</h4>
+<p>String and number options can refer to environment variables. In such a case,
+you must use the shell syntax e.g. <code>$VAR</code>. <b><i>DO NOT</i></b> single-quote or double-quote the string/number options,
+for example:</p>
+<p><center>
+<img src="/img/string.jpg" alt="Entering String Options" height="200" width="400">
+</center></p>
+<h4 id="common-config-options">Common Config Options</h4>
+<p>The following configuration options are common regardless of the
+specific toolchain being built:</p>
+<ul>
+<li>
+<p>Under <code>Paths and misc options</code></p>
+<ul>
+<li>
+<p><code>Local tarballs directory (CT_LOCAL_TARBALLS_DIR)</code></p>
+<p>This is the local directory that will contain downloaded package tarballs. If a given tarball is already present, then no
+ corresponding download of the archive will be performed. Note:</p>
+<ul>
+<li>
+<p>the value specified here should be an <em>absolute</em> path.</p>
+</li>
+<li>
+<p>the directory <strong><em>should exist prior</em></strong> to executing the toolchain build command below. Otherwise, the following warning will be issued:</p>
+<pre><code>$ bin/ct-ng build
+...
+[INFO ]  Building environment variables
+[WARN ]  Directory '${CT_LOCAL_TARBALLS_DIR}' does not exist.
+[WARN ]  Will not save downloaded tarballs to local storage.
+[EXTRA]  Preparing working directories
+...
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><code>Save new tarballs (CT_SAVE_TARBALLS)</code></p>
+<p>If selected, newly downloaded tarballs will be saved in
+the directory specified in <code>CT_LOCAL_TARBALLS_DIR</code>
+above. Recommended.</p>
+</li>
+<li>
+<p><code>Working directory (CT_WORK_DIR)</code></p>
+<p>This is where all build actions will be done. Default is 
+<code>${CT_TOP_DIR}/.build</code>. As explained in Section <a href="/using_crosstool-ng.html#phase-1">link</a>,
+ this is the recommended setting (i.e. working directory
+within build tree).</p>
+</li>
+<li>
+<p><code>Prefix directory (CT_PREFIX_DIR)</code></p>
+<p>Final toolchain installation directory. Note that the 
+value given here should be an <em>absolute</em> path.</p>
+</li>
+<li>
+<p><code>Remove the prefix dir prior to building (CT_RM_RF_PREFIX_DIR)</code></p>
+<p>If selected, and if <code>CT_PREFIX_DIR</code> exists,
+    then it will be <strong><em>deleted before</em></strong> the toolchain is  (re-)built.</p>
+</li>
+<li>
+<p><code>Stop after downloading tarballs (CT_ONLY_DOWNLOAD)</code></p>
+<p>Only download tarballs. Do not proceed with toolchain 
+    build. Useful for pre-retrieving the required tarball
+    archives before going off-line.</p>
+</li>
+<li>
+<p><code>Number of parallel jobs (CT_PARALLEL_JOBS)</code></p>
+<p>Number of <code>make</code> jobs that will run concurrently. 
+By default, (value of 0), crosstool-NG will set the number
+of jobs based on how many processors the host has. This value
+should be, generally, set to twice the number of processors
+of the build machine.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Under <code>Toolchain options</code></p>
+<ul>
+<li>
+<p><code>Use sysroot'ed toolchain (CT_USE_SYSROOT)</code></p>
+<p>Recommended.</p>
+</li>
+<li>
+<p><code>Tuple's vendor string (CT_TARGET_VENDOR)</code></p>
+<p>This corresponds to the vendor/manufacture field in the tuple
+of the toolchain being built<sup><a href="#fn5" id="ref5">5</a></sup>.
+It is an optional field that may
+    be omitted.
+If, say, the value <code>none</code> is specified here when
+building a GNU/Linux ARM cross-toolchain generating the  <em>armhf</em> EABI,
+     then the resultant tuple will be <code>arm-none-linux-gnueabihf-</code>. Otherwise, if left at the default value, then
+     the cross-toolchain tuple will be <code>arm-unknown-linux-gnueabihf-</code>.</p>
+<p>Note, the specified value must <em>not</em> contain spaces 
+    or dashes. Use a one-word string, or use underscores to separate words if need be.  Avoid dots, commas, and special characters.</p>
+</li>
+<li>
+<p><code>Type</code></p>
+<p>Select the toolchain type being generated. See <code>docs/6 - Toolchain types.txt</code>
+of the crosstool-NG sources for a description of toolchain types.
+    Also check out the note on <code>Linux kernel version</code> versus
+<code>Minimum supported kernel version</code> in Appendix <a href="/using_crosstool-ng.html#appendex-b-linux-kernel-version-vs-minimum-supported-kernel-version">link</a></p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="build-and-install">Build and Install</h3>
+<p>The following command builds and installs the final toolchain</p>
+<pre><code>$ bin/ct-ng build
+</code></pre>
+<p>It is possible to override the number of parallel jobs set in 
+configuration option <code>CT_PARALLEL_JOBS</code>. For example, to reset to 4 parallel jobs:</p>
+<pre><code>$ bin/ct-ng build.4
+</code></pre>
+<p>Upon a successful build, the build tree may be deleted to save
+disk space, e.g:</p>
+<pre><code>$ cd $KAZIDIR
+$ rm -r $CT_BUILDTREE
+</code></pre>
+<h2 id="performing-re-builds">Performing Re-builds</h2>
+<p>From the root of the (<em>Phase 1</em> generated) toolchain 
+build directory:</p>
+<ul>
+<li>
+<p><code>distclean</code> (if applicable):</p>
+<pre><code>$ bin/ct-ng distclean
+</code></pre>
+</li>
+<li>
+<p>Retrieve the configuration file.</p>
+<p>Previously installed toolchains contain the 
+<code>ct-ng</code> configuration file used to build them. To retrieve it: </p>
+<pre><code>$ ${CT_PREFIX_DIR}/bin/${CT_TARGET}-ct-ng.config &gt; .config
+</code></pre>
+<p>Alternatively, </p>
+<pre><code>$ bzcat ${CT_PREFIX_DIR}/build.log.bz2 | bin/ct-ng extractconfig &gt; .config
+</code></pre>
+</li>
+<li>
+<p>Reconfigure</p>
+<p>Once the configuration file, <em>.config</em>,
+has been restored at the root of the clean/fresh toolchain build tree, run:</p>
+<pre><code>$ bin/ct-ng oldconfig
+</code></pre>
+<p>to restore the toolchain configuration. Otherwise, to modify the configuration:</p>
+<pre><code>$ bin/ct-ng menuconfig
+</code></pre>
+</li>
+<li>
+<p>Re-build:</p>
+<pre><code>$ bin/ct-ng build[.N]
+</code></pre>
+</li>
+</ul>
+<h2 id="also-see"><em>Also See</em></h2>
+<ul>
+<li><a href="/building_arm_toolchain_with_crosstool-ng.html">ARM Toolchain with crosstool-NG</a> for a case study on building
+and using a crosstool-NG based toolchain.</li>
+</ul>
+<h2 id="resources">Resources</h2>
+<ul>
+<li>
+<p><a href="/toolchain_intro.html">Introducution to GNU/Linux Toolchain</a></p>
+</li>
+<li>
+<p><code>docs/</code> of the Crosstool-NG sources.</p>
+</li>
+<li>
+<p>http://elinux.org/Toolchains</p>
+</li>
+<li>
+<p>http://free-electrons.com/doc/training/embedded-linux/labs.pdf</p>
+</li>
+<li>
+<p><a href="/building_packages_with_configure.html">Building Packages with <em>configure</em></a></p>
+</li>
+</ul>
+<h2 id="appendix-a-known-issues">Appendix A: Known Issues</h2>
+<p><center><i>Notes in this section taken from the <a href="http://free-electrons.com/doc/training/embedded-linux/labs.pdf">free-electrons embedded linux training labs notes</a></i></center></p>
+<h3 id="archive-download-failure">Archive Download Failure</h3>
+<p>It is frequent that Crosstool-ng aborts because it can’t find a source archive on the Internet,
+when such an archive has moved or has been replaced by more recent versions. New Crosstool-
+ng versions ship with updated URLs, but in the meantime, you need work-arounds.
+If this happens to you, what you can do is look for the source archive by yourself on the In-
+ternet, and copy such an archive to the src directory in your home directory. Note that even
+source archives compressed in a different way (for example, ending with 
+        <code>.gz</code> instead of <code>.bz2</code>)
+will be fine too. Then, all you have to do is run 
+<code>./ct-ng build</code> again, and it will use the
+source archive that you downloaded.</p>
+<h3 id="ppl-0102-compiling-error-with-gcc-471"><em>ppl-0.10.2</em> compiling error with gcc 4.7.1</h3>
+<p>If you are using <em>gcc 4.7.1</em>, for example in Ubuntu 12.10,
+compilation will fail in <em>ppl-0.10.2</em> with the below error:</p>
+<pre><code>error: ’f_info’ was not declared in this scope
+</code></pre>
+<p>One solution is to add the <code>-fpermissive</code> flag to the
+<code>CT_EXTRA_FLAGS_FOR_HOST</code> setting
+(in <code>Path and misc options -&gt; Extra host compiler flags</code>).</p>
+<h2 id="appendex-b-linux-kernel-version-vs-minimum-supported-kernel-version">Appendex B: <code>Linux kernel version</code> vs. <code>Minimum supported kernel version</code></h2>
+<p><br>
+<center><i>NOTE: This section mainly applies to (e)glibc</i></center>
+<br>
+The <code>Linux kernel version</code> prompt is used to specify the
+version of Linux kernel headers that the C library 
+will be compiled against. The 
+<code>Minimum supported kernel version</code> menu entry 
+(<code>CT_LIBC_GLIBC_MIN_KERNEL</code>) 
+is used to specify 
+the oldest kernel that userspace binaries built with this toolchain can
+function with.
+See <a href="/toolchain_intro.html#general-issues-with-binary-toolchain-packages">An introduction to the GNU/Linux toolchain</a>
+ for a discussion on the implications of these settings.</p>
+<p>The following "contextual" account of a toolchain build aims to
+clarify the use of these settings. The crosstool-NG tree used
+here was 
+<a href="https://launchpad.net/linaro-toolchain-binaries/trunk/2013.10/+download/crosstool-ng-linaro-1.13.1-4.8-2013.10.tar.bz2">crosstool-ng-linaro-1.13.1-4.8-2013.10</a>.</p>
+<h3 id="configuration_1">Configuration</h3>
+<pre><code>$ cat .config
+...
+207 # Operating System
+208 #
+209 CT_KERNEL_SUPPORTS_SHARED_LIBS=y
+210 CT_KERNEL="linux"
+211 CT_KERNEL_VERSION="3.1.1"
+# CT_KERNEL_bare_metal is not set
+213 CT_KERNEL_linux=y
+214 CT_KERNEL_bare_metal_AVAILABLE=y
+215 CT_KERNEL_linux_AVAILABLE=y
+216 CT_KERNEL_V_3_1_1=y
+...
+463 CT_LIBC_GLIBC_KERNEL_VERSION_CHOSEN=y
+464 CT_LIBC_GLIBC_MIN_KERNEL_VERSION="2.6.9"
+465 CT_LIBC_GLIBC_MIN_KERNEL="2.6.9"
+...
+</code></pre>
+<h3 id="build-log">Build Log</h3>
+<p>Upon successful build completion:</p>
+<pre><code>$ cat build.log
+...
+162437 [CFG  ]    checking installed Linux kernel header files... 2.6.19 or later
+162438 [CFG  ]    configure: WARNING: minimum kernel version reset to 2.6.16
+162439 [CFG  ]    checking for kernel header at least 2.6.16... ok
+...
+</code></pre>
+<p>i.e the minimum kernel version was reset to v2.6.16 from the user
+specified value v2.6.9.</p>
+<h3 id="checking-kernel-version-info">Checking Kernel Version Info</h3>
+<ul>
+<li>
+<p><b><i>Kernel version that this eglibc was built against:</i></b></p>
+<pre><code>$ qemu-arm -L ${CT_PREFIX_DIR}/arm-linaro-linux-gnueabihf/sysroot/${CT_PREFIX_DIR}/arm-linaro-linux-gnueabihf/sysroot/lib/libc-2.18-2013.10.so 
+Compiled on a Linux 3.1.1 system ...
+</code></pre>
+</li>
+<li>
+<p><b><i>Checking minimum supported kernel version by this eglibc:</i></b></p>
+<p>The minimum supported kernel version can be read from the <code>.note.ABI-tag</code>
+section of the libc <a href="/elf_format.html"><em>ELF object file</em></a>:</p>
+<pre><code>$ arm-linux-gnueabi-readelf -n ${CT_PREFIX_DIR}/arm-linaro-linux-gnueabihf/sysroot/lib/libc-2.18-2013.10.so | grep Linux
+OS: Linux, ABI: 2.6.16
+</code></pre>
+<p>Alternatively, since <code>file(1)</code><sup><a href="#fn6" id="ref6">6</a></sup>
+ also reads this section of an <a href="/elf_format.html"><em>ELF object file</em></a>:</p>
+<pre><code>$ file ${CT_PREFIX_DIR}/arm-linaro-linux-gnueabihf/sysroot/lib/libc-2.18-2013.10.so  
+... for GNU/Linux 2.6.16 ...
+</code></pre>
+</li>
+</ul>
+<h2 id="footnotes">Footnotes</h2>
+<p><sup id="fn2">2. The <em>ct-ng</em> utility is actually
+ a "bash-make" script.<a href="#ref2" title="Return to text segment"><i> [go back]</i></a></sup></p>
+<p><sup id="fn3">3. See item "Working directory" in Section <a href="/using_crosstool-ng.html#common-config-options">link</a> and named <code>.build</code>.<a href="#ref3" title="Return to text segment"><i> [go back]</i></a></sup></p>
+<p><sup id="fn4">4. See <a href="/xtools_usage.html">Using a GNU/Linux Cross-Toolchain</a>
+ for an explanation of GNU triplets     and the meaning of <em>target</em> in the context of the GNU Autotools<a href="#ref4" title="Return to text segment"><i> [go back]</i></a></sup></p>
+<p><sup id="fn5">5. See <a href="/toolchain_intro.html">Introduction to GNU/Linux Toolchain</a> for an explanation of toolchain tuple names.<a href="#ref5" title="Return to text segment"><i> [go back]</i></a></sup></p>
+<p><sup id="fn6">6. See <em>src/readelf.c</em> of its source code.<a href="#ref6" title="Return to text segment"><i> [go back]</i></a></sup></p></div>
 
-**Bold** and _Italic_ and `Code` text
+	
+	<!-- "404" for "url/{author|img|theme}/index.html" -->
 
-[Link](url) and ![Image](src)
-```
+	<!-- list all categories for  "url/category/index.html" --> 
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+ 
 
-### Jekyll Themes
+			<!-- footer -->
+<footer>
+<hr></hr>
+<div id="footer">
+<table>
+	<tbody>
+		<tr>
+			<td nowrap="nowrap" align="left" width="1%">
+				<div id="copylefticon">
+					<a href="http://www.gnu.org/licenses/old-licenses/fdl-1.2.txt">
+					<img alt="GFDL v1.2" src="/img/gnu-fdl.png"></img>
+					</a>
+				</div>
+			</td>
+			<td align="center">
+					Content is available under <a href="http://www.gnu.org/licenses/old-licenses/fdl-1.2.txt"><i>GNU Free Documentation License 1.2</i></a>
+			</td>
+			<td align="right">
+					&copy; nairobi-embedded
+			</td>
+		</tr>
+	</tbody>
+</table>
+</div>
+</footer>
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/lexliy/lexliy.github.io/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+	  </div>
+	</body>
+</html>
